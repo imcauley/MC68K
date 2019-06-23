@@ -1,11 +1,16 @@
 use std::process;
 
 const DRD: u8 = 0;
+const ARD: u8 = 1;
 
 struct Memory {
     ram: [u8; 128],
     dreg: [u8; 64],
-    areg: [u8; 64]
+    areg: [u8; 64],
+    ssp: u32,
+    usp: u32,
+    pc: u32,
+    sr: u16
 }
 
 impl Default for Memory {
@@ -13,7 +18,11 @@ impl Default for Memory {
         return Memory {
             ram: [0; 128],
             dreg: [0; 64],
-            areg: [0; 64]
+            areg: [0; 64],
+            ssp: 0,
+            usp: 0,
+            pc: 0,
+            sr: 0
         }
     }
 }
@@ -22,7 +31,7 @@ impl Default for Memory {
 
 // }
 
-fn get_source(mem:Memory, code:u16, eam:u8, place:u8) -> u32 {
+fn get_source(mem:Memory, code:u16, eam:u8, place:u8, size:u8) -> u32 {
     match eam {
         DRD => {
             let mut reg_num: u16 = code.clone();
