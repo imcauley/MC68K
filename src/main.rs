@@ -6,6 +6,9 @@ const LONG: u8 = 3;
 
 const DRD: u8 = 0;
 const ARD: u8 = 1;
+const RI: u8 = 3;
+const PIRI: u8 = 4;
+const PDRI: u8 = 5;
 
 struct Memory {
     ram: [u8; 128],
@@ -45,6 +48,21 @@ fn get_source(mem:Memory, code:u16, eam:u8, place:u8, size:u8) -> u32 {
             return get_long(&mem.dreg, reg_num as usize)
             // return mem.dreg[reg_num as usize] as u32;
         },
+        ARD => {
+            let mut reg_num: u16 = code.clone();
+            reg_num >>= place;
+            reg_num &= 0b0000000000000111;
+            reg_num *= 4;
+            return get_long(&mem.areg, reg_num as usize)
+        },
+        RI => {
+            let mut reg_num: u16 = code.clone();
+            reg_num >>= place;
+            reg_num &= 0b0000000000000111;
+            reg_num *= 4;
+            let mut address = get_long(&mem.areg, reg_num as usize);
+            return get_long(&mem.ram, address as usize);
+        },
         _ => {
             process::exit(1);
         }
@@ -52,12 +70,12 @@ fn get_source(mem:Memory, code:u16, eam:u8, place:u8, size:u8) -> u32 {
 }
 
 fn get_word(mem:&[u8], start:usize) -> u32 {
-    if(start % 2 == 1) {panic!("Trying to address on an even address")}
+    if(start % 2 == 1) {panic!("Trying to address on an odd address")}
     return (mem[start + 1] as u32 *256) + mem[start] as u32;
 }
 
 fn get_long(mem:&[u8], start:usize) -> u32 {
-    if(start % 2 == 1) {panic!("Trying to address on an even address")}
+    if(start % 2 == 1) {panic!("Trying to address on an odd address")}
     return (mem[start + 3] as u32 *16777216)
         + (mem[start + 2] as u32 *65536)
         + (mem[start + 1] as u32 *256) 
@@ -85,5 +103,3 @@ fn main(){
     // println!("{ }", 0b1101000100010001);
     println!("{ }", get_source(mem, code, DRD, 9, LONG));
 }
-
-
