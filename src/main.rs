@@ -69,6 +69,32 @@ fn get_source(mem:Memory, code:u16, eam:u8, place:u8, size:u8) -> u32 {
     }
 }
 
+fn set_dest(mem:Memory, code:u16, eam:u8, place:u8, size: usize, value:u32) {
+    let byte_values = split_bytes(value, size);
+    
+    match eam {
+        DRD => {
+            let mut reg_num: u16 = code.clone();
+            reg_num >>= place;
+            reg_num &= 0b0000000000000111;
+            reg_num *= 4;
+        },
+        _ => {
+            process::exit(1);
+        }
+    }
+}
+
+fn split_bytes(value: u32, size: usize) -> Vec<u8> {
+    let mut bytes: Vec<u8> = vec![];
+    let mut current = value.clone();
+    for _ in 0..size {
+        bytes.push(current as u8);
+        current >>= 8;
+    }
+    return bytes;
+}
+
 fn get_word(mem:&[u8], start:usize) -> u32 {
     if(start % 2 == 1) {panic!("Trying to address on an odd address")}
     return (mem[start + 1] as u32 *256) + mem[start] as u32;
@@ -82,7 +108,7 @@ fn get_long(mem:&[u8], start:usize) -> u32 {
         + mem[start] as u32;
 }
 
-fn main(){
+fn main() {
     // let timer = timer::Timer::new();
     // let (tx, rx) = channel();
     // let _guard = timer.schedule_with_delay(chrono::Duration::milliseconds(3), move || {
@@ -95,11 +121,12 @@ fn main(){
     // rx.recv().unwrap();
     // println!("This code has been executed after 3 seconds");
 
-    let mut mem = Memory::default();
-    mem.dreg[4] = 255;
-    mem.dreg[5] = 87;
-    let code:u16 = 0b1101001100010001;
+    // let mut mem = Memory::default();
+    // mem.dreg[4] = 255;
+    // mem.dreg[5] = 87;
+    // let code:u16 = 0b1101001100010001;
     // find_address_mode(code);
     // println!("{ }", 0b1101000100010001);
-    println!("{ }", get_source(mem, code, DRD, 9, LONG));
+    split_bytes(0xF9830293, 4);
+    // println!("{ }", get_source(mem, code, DRD, 9, LONG));
 }
