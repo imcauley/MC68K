@@ -6,9 +6,10 @@ const LONG: u8 = 4;
 
 const DRD: u8 = 0;
 const ARD: u8 = 1;
-const RI: u8 = 3;
-const PIRI: u8 = 4;
-const PDRI: u8 = 5;
+const RI: u8 = 2;
+const PIRI: u8 = 3;
+const PDRI: u8 = 4;
+const RIO: u8 = 5;
 
 struct Memory {
     ram: [u8; 128],
@@ -34,11 +35,7 @@ impl Default for Memory {
     }
 }
 
-// fn find_address_mode(code:u16, place:u8) -> u8 {
-
-// }
-
-fn get_source(mem:Memory, code:u16, eam:u8, place:u8, size:u8) -> u32 {
+fn get_value(mem: &Memory, code:u16, eam:u8, place:u8, size:u8) -> u32 {
     match eam {
         DRD => {
             let mut reg_num: u16 = code.clone();
@@ -69,12 +66,8 @@ fn get_source(mem:Memory, code:u16, eam:u8, place:u8, size:u8) -> u32 {
     }
 }
 
-fn set_dest(mem: &mut Memory, code:u16, eam:u8, place:u8, size: usize, value:u32) {
+fn set_value(mem: &mut Memory, code:u16, eam:u8, place:u8, size: usize, value:u32) {
     let byte_values = split_bytes(value, size);
-
-    for i in 0..size {
-        println!("{ }", byte_values[i]);
-    }
     
     match eam {
         DRD => {
@@ -93,6 +86,10 @@ fn set_dest(mem: &mut Memory, code:u16, eam:u8, place:u8, size: usize, value:u32
     }
 }
 
+fn get_eam(code:u16, place:u8) -> u8 {
+    
+}
+
 fn split_bytes(value: u32, size: usize) -> Vec<u8> {
     let mut bytes: Vec<u8> = vec![];
     let mut current = value.clone();
@@ -102,6 +99,12 @@ fn split_bytes(value: u32, size: usize) -> Vec<u8> {
         current >>= 8;
     }
     return bytes;
+}
+
+fn decode(mem: &mut Memory, code: u16) {
+    if(code & 0b1111 0001 0000 0000 == 0b1101 0001 0000 0000) {
+        let src = get_value(mem, code, DRD, )
+    }
 }
 
 fn get_word(mem:&[u8], start:usize) -> u32 {
@@ -137,8 +140,5 @@ fn main() {
     // find_address_mode(code);
     // println!("{ }", 0b1101000100010001);
     set_dest(&mut mem, code, DRD, 0, WORD as usize, 0xFA73);
-    for i in 4..6 {
-        println!("{ }", mem.dreg[i]);
-    }
     // println!("{ }", get_source(mem, code, DRD, 9, LONG));
 }
