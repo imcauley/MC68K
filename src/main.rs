@@ -1,8 +1,8 @@
 use std::process;
 
-const BYTE: u8 = 0;
-const WORD: u8 = 1;
-const LONG: u8 = 3;
+const BYTE: u8 = 1;
+const WORD: u8 = 2;
+const LONG: u8 = 4;
 
 const DRD: u8 = 0;
 const ARD: u8 = 1;
@@ -69,8 +69,12 @@ fn get_source(mem:Memory, code:u16, eam:u8, place:u8, size:u8) -> u32 {
     }
 }
 
-fn set_dest(mem:Memory, code:u16, eam:u8, place:u8, size: usize, value:u32) {
+fn set_dest(mem: &mut Memory, code:u16, eam:u8, place:u8, size: usize, value:u32) {
     let byte_values = split_bytes(value, size);
+
+    for i in 0..size {
+        println!("{ }", byte_values[i]);
+    }
     
     match eam {
         DRD => {
@@ -78,6 +82,10 @@ fn set_dest(mem:Memory, code:u16, eam:u8, place:u8, size: usize, value:u32) {
             reg_num >>= place;
             reg_num &= 0b0000000000000111;
             reg_num *= 4;
+            
+            for i in 0..size {
+                mem.dreg[reg_num as usize + i] = byte_values[i];
+            }
         },
         _ => {
             process::exit(1);
@@ -89,6 +97,7 @@ fn split_bytes(value: u32, size: usize) -> Vec<u8> {
     let mut bytes: Vec<u8> = vec![];
     let mut current = value.clone();
     for _ in 0..size {
+        println!{"test"};
         bytes.push(current as u8);
         current >>= 8;
     }
@@ -121,12 +130,15 @@ fn main() {
     // rx.recv().unwrap();
     // println!("This code has been executed after 3 seconds");
 
-    // let mut mem = Memory::default();
+    let mut mem = Memory::default();
     // mem.dreg[4] = 255;
     // mem.dreg[5] = 87;
-    // let code:u16 = 0b1101001100010001;
+    let code:u16 = 0b1101001100010001;
     // find_address_mode(code);
     // println!("{ }", 0b1101000100010001);
-    split_bytes(0xF9830293, 4);
+    set_dest(&mut mem, code, DRD, 0, WORD as usize, 0xFA73);
+    for i in 4..6 {
+        println!("{ }", mem.dreg[i]);
+    }
     // println!("{ }", get_source(mem, code, DRD, 9, LONG));
 }
