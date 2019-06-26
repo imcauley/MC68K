@@ -5,7 +5,9 @@ u8 *MC68K::get_address(u16 code, int mode, int place) {
         mode = this->get_EAM(code, place);
     }
     
+    u16 address;
     u16 reg_num = code;
+
     switch (mode) {
     case DRD:
         reg_num = reg_num >> place;
@@ -23,7 +25,7 @@ u8 *MC68K::get_address(u16 code, int mode, int place) {
         reg_num = reg_num >> place;
         reg_num = reg_num & 0b0000000000000111;
         reg_num *= 4;
-        u16 address = this->areg[reg_num];
+        address = this->areg[reg_num];
         return &(this->RAM[address]);
 
     default:
