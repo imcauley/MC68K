@@ -1,7 +1,11 @@
 #include "MC68K.h"
 
 u8 *MC68K::get_address(u16 code, int mode, int place) {      
-    u16 reg_num = code;         
+    if(mode < 0) {
+        mode = this->get_EAM(code, place);
+    }
+    
+    u16 reg_num = code;
     switch (mode) {
     case DRD:
         reg_num = reg_num >> place;
@@ -26,6 +30,13 @@ u8 *MC68K::get_address(u16 code, int mode, int place) {
         exit(0);
         break;
     }
+}
+
+int MC68K::get_EAM(u16 code, int place) {
+    int mode = code;
+    mode >>= (place + 3);
+    mode &= 0b111;
+    return mode;
 }
 
 u16 MC68K::get_PC() {
