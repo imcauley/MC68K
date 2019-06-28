@@ -35,7 +35,9 @@ u8 *MC68K::get_address(u16 code, int mode, int place) {
 }
 
 void MC68K::perform_unary_op(std::function<u8(u8)> func, u8 *address, int size) {
-    *address = func(*address);
+    for(int i = 0; i < size+1; i++) {
+        *(address + i) = func(*(address + i));
+    }
     return;
 }
 
@@ -48,4 +50,8 @@ int MC68K::get_EAM(u16 code, int place) {
 
 u16 MC68K::get_PC() {
     return this->PC;
+}
+
+u16 MC68K::get_word(u8 *address) {
+    return(*address + (*(address + 1) * 256));
 }
