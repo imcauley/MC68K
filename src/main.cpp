@@ -7,4 +7,7 @@ int main() {
 
     u8 *add = proc->get_address(code, DRD, 0);
     std::cout << int(*add) << "\n";
+
+    proc->perform_unary_op([](u8 i) -> u8 {return 0;}, add, 0);
+    std::cout << int(*add) << "\n";
 }
