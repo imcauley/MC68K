@@ -20,6 +20,9 @@ class MC68K {
 
     u16 get_word(u8 *address);
     u32 get_long(u8 *address);
+    int mask_bits(u32 num, int start, int num_bits);
+
+    void decode(u16 code);
 };
 
 #endif

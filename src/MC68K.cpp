@@ -1,4 +1,5 @@
 #include "MC68K.h"
+#include <cmath>
 
 u8 *MC68K::get_address(u16 code, int mode, int place) {      
     if(mode < 0) {
@@ -54,4 +55,23 @@ u16 MC68K::get_PC() {
 
 u16 MC68K::get_word(u8 *address) {
     return(*address + (*(address + 1) * 256));
+}
+
+
+//where start is the rightmost position of the binary number
+int MC68K::mask_bits(u32 num, int start, int num_bits) {
+    num >>= start;
+    u32 mask = (std::pow(2, num_bits)) - 1;
+    num &= mask;
+    return num;
+}
+
+void MC68K::decode(u16 code) {
+
+    // CLR
+    if((code & 0b1111111100000000) == 0b0100001000000000) {
+        int size = this->mask_bits(u32(code), 6, 2);
+        u8* address = this->get_address(code, -1, 0);
+        this->perform_unary_op([](u8 i) -> u8 {return 0;}, address, size);
+    }
 }
